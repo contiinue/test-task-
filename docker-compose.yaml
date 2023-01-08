@@ -1,0 +1,38 @@
+version: '3.1'
+
+volumes:
+  data-db:
+
+services:
+  mongodb:
+    image: mongo
+    volumes:
+      - ./data-db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mongoadmin
+      MONGO_INITDB_DATABASE: django_mongodb_docker
+    ports:
+      - 27017:27017
+
+    networks:
+      - web_network
+
+  web:
+    container_name: web
+    build:
+      dockerfile: docker/DockerFile
+    env_file:
+      - .env
+    ports:
+      - '8000:8000'
+    networks:
+      - web_network
+    restart: always
+
+    depends_on:
+      - mongodb
+
+networks:
+  web_network:
+    driver: bridge
